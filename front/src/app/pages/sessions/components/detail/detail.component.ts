@@ -1,6 +1,7 @@
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder } from '@angular/forms';
+import { switchMap, tap } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Teacher } from '../../../../core/models/teacher.interface';
@@ -76,15 +77,15 @@ export class DetailComponent implements OnInit {
   private fetchSession(): void {
     this.sessionApiService
       .detail(this.sessionId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((session: Session) => {
-        this.session = session;
-        this.isParticipate = session.users.some(u => u === this.sessionService.sessionInformation!.id);
-        this.teacherService
-          .detail(session.teacher_id.toString())
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe((teacher: Teacher) => this.teacher = teacher);
-      });
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        tap((session: Session) => {
+          this.session = session;
+          this.isParticipate = session.users.some(u => u === this.sessionService.sessionInformation!.id);
+        }),
+        switchMap((session: Session) => this.teacherService.detail(session.teacher_id.toString()))
+      )
+      .subscribe((teacher: Teacher) => this.teacher = teacher);
   }
 
 }
