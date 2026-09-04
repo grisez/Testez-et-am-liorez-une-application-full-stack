@@ -7,7 +7,7 @@ import com.openclassrooms.starterjwt.payload.response.JwtResponse;
 import com.openclassrooms.starterjwt.payload.response.MessageResponse;
 import com.openclassrooms.starterjwt.security.jwt.JwtUtils;
 import com.openclassrooms.starterjwt.security.services.UserDetailsImpl;
-import com.openclassrooms.starterjwt.services.UserService;
+import com.openclassrooms.starterjwt.services.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,14 +24,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
-    private final UserService userService;
+    private final AuthService authService;
 
     public AuthController(AuthenticationManager authenticationManager,
                    JwtUtils jwtUtils,
-                   UserService userService) {
+                   AuthService authService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
-        this.userService = userService;
+        this.authService = authService;
     }
 
     @PostMapping("/login")
@@ -44,7 +44,7 @@ public class AuthController {
         String jwt = jwtUtils.generateJwtToken(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        boolean isAdmin = this.userService.isAdmin(userDetails.getUsername());
+        boolean isAdmin = this.authService.isAdmin(userDetails.getUsername());
 
         return ResponseEntity.ok(new JwtResponse(jwt,
                 userDetails.getId(),
@@ -56,7 +56,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        this.userService.register(signUpRequest);
+        this.authService.register(signUpRequest);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
