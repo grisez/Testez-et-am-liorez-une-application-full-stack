@@ -1,0 +1,34 @@
+package com.openclassrooms.starterjwt.services;
+
+import com.openclassrooms.starterjwt.exception.NotFoundException;
+import com.openclassrooms.starterjwt.exception.UnauthorizedException;
+import com.openclassrooms.starterjwt.models.User;
+import com.openclassrooms.starterjwt.repository.UserRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.Objects;
+
+@Service
+public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
+
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public void delete(Long id, String requestingUserEmail) {
+        User user = this.userRepository.findById(id).orElseThrow(NotFoundException::new);
+
+        if (!Objects.equals(user.getEmail(), requestingUserEmail)) {
+            throw new UnauthorizedException();
+        }
+
+        this.userRepository.deleteById(id);
+    }
+
+    @Override
+    public User findById(Long id) {
+        return this.userRepository.findById(id).orElse(null);
+    }
+}
