@@ -29,10 +29,6 @@ public class UserController {
     public ResponseEntity<?> findById(@PathVariable("id") String id) {
         User user = this.userService.findById(Long.valueOf(id));
 
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         return ResponseEntity.ok().body(this.userMapper.toDto(user));
     }
 
