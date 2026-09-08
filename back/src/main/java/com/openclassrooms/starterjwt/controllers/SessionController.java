@@ -6,6 +6,7 @@ import com.openclassrooms.starterjwt.mapper.SessionMapper;
 import com.openclassrooms.starterjwt.models.Session;
 import com.openclassrooms.starterjwt.services.SessionService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,7 +50,7 @@ public class SessionController {
     public ResponseEntity<SessionDto> create(@Valid @RequestBody SessionDto sessionDto) {
         Session session = this.sessionService.create(this.sessionMapper.toEntity(sessionDto));
 
-        return ResponseEntity.ok().body(this.sessionMapper.toDto(session));
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.sessionMapper.toDto(session));
     }
 
     @PutMapping("{id}")
