@@ -1,5 +1,6 @@
 package com.openclassrooms.starterjwt.services;
 
+import com.openclassrooms.starterjwt.exception.NotFoundException;
 import com.openclassrooms.starterjwt.models.Teacher;
 import com.openclassrooms.starterjwt.repository.TeacherRepository;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,15 +53,12 @@ class TeacherServiceImplTest {
     }
 
     @Test
-    void findById_shouldReturnNull_whenTeacherDoesNotExist() {
+    void findById_shouldThrowNotFoundException_whenTeacherDoesNotExist() {
         // given
         when(teacherRepository.findById(99L)).thenReturn(Optional.empty());
 
-        // when
-        Teacher result = teacherService.findById(99L);
-
-        // then
-        assertThat(result).isNull();
-        verify(teacherRepository).findById(99L);
+        // when / then
+        assertThatThrownBy(() -> teacherService.findById(99L))
+                .isInstanceOf(NotFoundException.class);
     }
 }
