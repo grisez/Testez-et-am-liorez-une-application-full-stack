@@ -29,6 +29,7 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public void delete(Long id) {
+        this.sessionRepository.findById(id).orElseThrow(NotFoundException::new);
         this.sessionRepository.deleteById(id);
     }
 
@@ -39,7 +40,7 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public Session getById(Long id) {
-        return this.sessionRepository.findById(id).orElse(null);
+        return this.sessionRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 
     @Override
