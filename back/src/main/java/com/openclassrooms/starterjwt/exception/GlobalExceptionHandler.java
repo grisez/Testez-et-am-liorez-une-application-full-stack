@@ -4,12 +4,13 @@ import com.openclassrooms.starterjwt.payload.response.MessageResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(NumberFormatException.class)
-    public ResponseEntity<Void> handleNumberFormatException() {
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Void> handleMethodArgumentTypeMismatchException() {
         return ResponseEntity.badRequest().build();
     }
 
