@@ -16,5 +16,5 @@ import org.springframework.test.context.TestPropertySource;
         "oc.app.jwtSecret=MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODk=",
         "oc.app.jwtExpirationMs=86400000"
 })
-abstract class AbstractControllerIntegrationTest {
+public abstract class AbstractControllerIntegrationTest {
 }

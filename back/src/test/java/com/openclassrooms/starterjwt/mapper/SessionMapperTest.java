@@ -89,4 +89,40 @@ class SessionMapperTest {
         assertThat(sessionDto.getTeacher_id()).isEqualTo(1L);
         assertThat(sessionDto.getUsers()).containsExactly(2L);
     }
+
+    @Test
+    void toDto_shouldReturnNullTeacherId_whenSessionHasNoTeacher() {
+        // given
+        Session session = Session.builder()
+                .name("Yoga du matin")
+                .date(new Date())
+                .description("Une session")
+                .teacher(null)
+                .users(List.of())
+                .build();
+
+        // when
+        SessionDto sessionDto = sessionMapper.toDto(session);
+
+        // then
+        assertThat(sessionDto.getTeacher_id()).isNull();
+        assertThat(sessionDto.getUsers()).isEmpty();
+    }
+
+    @Test
+    void toEntity_shouldReturnEmptyUsersList_whenSessionDtoHasNoUsers() {
+        // given
+        SessionDto sessionDto = new SessionDto();
+        sessionDto.setName("Yoga du matin");
+        sessionDto.setDate(new Date());
+        sessionDto.setDescription("Une session");
+        sessionDto.setTeacher_id(null);
+        sessionDto.setUsers(null);
+
+        // when
+        Session session = sessionMapper.toEntity(sessionDto);
+
+        // then
+        assertThat(session.getUsers()).isEmpty();
+    }
 }
