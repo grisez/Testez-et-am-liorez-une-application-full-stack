@@ -93,6 +93,20 @@ class SessionControllerTest extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    void update_shouldReturn400_whenSessionDataIsInvalid() throws Exception {
+        SessionDto sessionDto = new SessionDto();
+        sessionDto.setName("");
+        sessionDto.setDate(new Date());
+        sessionDto.setTeacher_id(teacher.getId());
+        sessionDto.setDescription("Description mise a jour");
+
+        mockMvc.perform(put("/api/session/{id}", session.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sessionDto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void create_shouldReturn201_whenSessionIsValid() throws Exception {
         // Session.teacher is a unique @OneToOne relation: needs its own teacher,
         // distinct from the one already linked to the session created in setUp().

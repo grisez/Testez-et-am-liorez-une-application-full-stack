@@ -72,6 +72,32 @@ class AuthControllerTest extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    void login_shouldReturn400_whenRequiredFieldIsMissing() throws Exception {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("");
+        loginRequest.setPassword("password123");
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void register_shouldReturn400_whenRequiredFieldIsMissing() throws Exception {
+        SignupRequest signupRequest = new SignupRequest();
+        signupRequest.setEmail("");
+        signupRequest.setLastName("Nouveau");
+        signupRequest.setFirstName("Prof");
+        signupRequest.setPassword("password123");
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signupRequest)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void register_shouldReturn201AndPersistUser_whenEmailIsNotTaken() throws Exception {
         SignupRequest signupRequest = new SignupRequest();
         signupRequest.setEmail("new.teacher@mail.com");
