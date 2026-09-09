@@ -16,9 +16,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Date;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -65,6 +67,29 @@ class SessionControllerTest extends AbstractControllerIntegrationTest {
     void findById_shouldReturn404_whenSessionDoesNotExist() throws Exception {
         mockMvc.perform(get("/api/session/{id}", 99999L))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void findAll_shouldReturnAllSessions() throws Exception {
+        mockMvc.perform(get("/api/session"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)));
+    }
+
+    @Test
+    void update_shouldReturnUpdatedSession_whenSessionIsValid() throws Exception {
+        SessionDto sessionDto = new SessionDto();
+        sessionDto.setName("Yoga du matin (mis a jour)");
+        sessionDto.setDate(new Date());
+        sessionDto.setTeacher_id(teacher.getId());
+        sessionDto.setDescription("Description mise a jour");
+
+        mockMvc.perform(put("/api/session/{id}", session.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sessionDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Yoga du matin (mis a jour)"))
+                .andExpect(jsonPath("$.description").value("Description mise a jour"));
     }
 
     @Test
