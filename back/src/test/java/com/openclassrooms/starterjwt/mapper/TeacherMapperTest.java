@@ -4,6 +4,8 @@ import com.openclassrooms.starterjwt.dto.TeacherDto;
 import com.openclassrooms.starterjwt.models.Teacher;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TeacherMapperTest {
@@ -48,5 +50,53 @@ class TeacherMapperTest {
 
         // then
         assertThat(dto).isNull();
+    }
+
+    @Test
+    void toDto_shouldReturnNull_whenListIsNull() {
+        // given / when
+        List<TeacherDto> result = teacherMapper.toDto((List<Teacher>) null);
+
+        // then
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void toDto_shouldMapList_whenGivenTeachers() {
+        // given
+        Teacher teacher1 = Teacher.builder().id(1L).firstName("Margot").lastName("Delahaye").build();
+        Teacher teacher2 = Teacher.builder().id(2L).firstName("Hélène").lastName("Thiercelin").build();
+
+        // when
+        List<TeacherDto> result = teacherMapper.toDto(List.of(teacher1, teacher2));
+
+        // then
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getFirstName()).isEqualTo("Margot");
+    }
+
+    @Test
+    void toEntity_shouldReturnNull_whenListIsNull() {
+        // given / when
+        List<Teacher> result = teacherMapper.toEntity((List<TeacherDto>) null);
+
+        // then
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void toEntity_shouldMapList_whenGivenDtos() {
+        // given
+        TeacherDto dto1 = new TeacherDto();
+        dto1.setId(1L);
+        dto1.setFirstName("Margot");
+        dto1.setLastName("Delahaye");
+
+        // when
+        List<Teacher> result = teacherMapper.toEntity(List.of(dto1));
+
+        // then
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getFirstName()).isEqualTo("Margot");
     }
 }

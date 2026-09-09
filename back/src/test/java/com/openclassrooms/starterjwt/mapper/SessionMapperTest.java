@@ -125,4 +125,76 @@ class SessionMapperTest {
         // then
         assertThat(session.getUsers()).isEmpty();
     }
+
+    @Test
+    void toEntity_shouldReturnNull_whenSessionDtoIsNull() {
+        // given / when
+        Session session = sessionMapper.toEntity((SessionDto) null);
+
+        // then
+        assertThat(session).isNull();
+    }
+
+    @Test
+    void toDto_shouldReturnNull_whenSessionIsNull() {
+        // given / when
+        SessionDto sessionDto = sessionMapper.toDto((Session) null);
+
+        // then
+        assertThat(sessionDto).isNull();
+    }
+
+    @Test
+    void toDto_shouldReturnEmptyUsersList_whenSessionUsersFieldIsNull() {
+        // given: no .users(...) call at all, so getUsers() is null (not just empty)
+        Session session = Session.builder()
+                .name("Yoga du matin")
+                .date(new Date())
+                .description("Une session")
+                .build();
+
+        // when
+        SessionDto sessionDto = sessionMapper.toDto(session);
+
+        // then
+        assertThat(sessionDto.getUsers()).isEmpty();
+    }
+
+    @Test
+    void toDto_shouldReturnNull_whenListIsNull() {
+        // given / when
+        List<SessionDto> result = sessionMapper.toDto((List<Session>) null);
+
+        // then
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void toEntity_shouldReturnNull_whenListIsNull() {
+        // given / when
+        List<Session> result = sessionMapper.toEntity((List<SessionDto>) null);
+
+        // then
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void toEntity_shouldMapList_whenGivenSessionDtos() {
+        // given
+        Teacher teacher = Teacher.builder().id(1L).firstName("Margot").lastName("Delahaye").build();
+        when(teacherService.findById(1L)).thenReturn(teacher);
+
+        SessionDto sessionDto = new SessionDto();
+        sessionDto.setName("Yoga du matin");
+        sessionDto.setDate(new Date());
+        sessionDto.setDescription("Une session");
+        sessionDto.setTeacher_id(1L);
+
+        // when
+        List<Session> result = sessionMapper.toEntity(List.of(sessionDto));
+
+        // then
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getTeacher()).isEqualTo(teacher);
+    }
 }

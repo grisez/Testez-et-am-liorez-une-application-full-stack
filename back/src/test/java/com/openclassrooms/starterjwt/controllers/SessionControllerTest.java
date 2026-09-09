@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassrooms.starterjwt.dto.SessionDto;
 import com.openclassrooms.starterjwt.models.Session;
 import com.openclassrooms.starterjwt.models.Teacher;
+import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.repository.SessionRepository;
 import com.openclassrooms.starterjwt.repository.TeacherRepository;
+import com.openclassrooms.starterjwt.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +41,26 @@ class SessionControllerTest extends AbstractControllerIntegrationTest {
     @Autowired
     private TeacherRepository teacherRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     private Teacher teacher;
     private Session session;
+    private User user;
 
     @BeforeEach
     void setUp() {
         sessionRepository.deleteAll();
         teacherRepository.deleteAll();
+        userRepository.deleteAll();
         teacher = teacherRepository.save(Teacher.builder().firstName("Margot").lastName("Delahaye").build());
+        user = userRepository.save(User.builder()
+                .email("participant@mail.com")
+                .lastName("Doe")
+                .firstName("John")
+                .password("encoded")
+                .admin(false)
+                .build());
         session = sessionRepository.save(Session.builder()
                 .name("Yoga du matin")
                 .date(new Date())
@@ -151,5 +165,35 @@ class SessionControllerTest extends AbstractControllerIntegrationTest {
     void delete_shouldReturn404_whenSessionDoesNotExist() throws Exception {
         mockMvc.perform(delete("/api/session/{id}", 99999L))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void participate_shouldReturn204_whenUserIsNotYetParticipating() throws Exception {
+        mockMvc.perform(post("/api/session/{id}/participate/{userId}", session.getId(), user.getId()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void participate_shouldReturn400_whenUserAlreadyParticipates() throws Exception {
+        mockMvc.perform(post("/api/session/{id}/participate/{userId}", session.getId(), user.getId()))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(post("/api/session/{id}/participate/{userId}", session.getId(), user.getId()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void noLongerParticipate_shouldReturn204_whenUserWasParticipating() throws Exception {
+        mockMvc.perform(post("/api/session/{id}/participate/{userId}", session.getId(), user.getId()))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(delete("/api/session/{id}/participate/{userId}", session.getId(), user.getId()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void noLongerParticipate_shouldReturn400_whenUserWasNotParticipating() throws Exception {
+        mockMvc.perform(delete("/api/session/{id}/participate/{userId}", session.getId(), user.getId()))
+                .andExpect(status().isBadRequest());
     }
 }
