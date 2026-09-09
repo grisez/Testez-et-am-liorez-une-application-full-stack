@@ -12,9 +12,18 @@ module.exports = {
   coveragePathIgnorePatterns: ['<rootDir>/node_modules/'],
   coverageThreshold: {
     global: {
-      statements: 80
+      statements: 80,
+      branches: 80,
+      lines: 80,
+      functions: 80
     },
   },
+  collectCoverageFrom: [
+    'src/app/**/*.ts',
+    '!src/app/**/*.spec.ts',
+    '!src/app/**/*.module.ts',
+    '!src/app/core/models/**',
+  ],
   roots: [
     "<rootDir>"
   ],
