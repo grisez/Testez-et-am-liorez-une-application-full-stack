@@ -37,6 +37,12 @@ yarn-error.log
 testem.log
 /typings
 
+# Cypress / nyc coverage artifacts
+/.nyc_output
+/cypress/screenshots
+/cypress/videos
+/cypress/downloads
+
 # System files
 .DS_Store
 Thumbs.db
