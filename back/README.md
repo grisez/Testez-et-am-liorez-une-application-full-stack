@@ -1,32 +1,56 @@
 # Yoga App !
 
-Backend de l'application Yoga App !.
+Backend of the Yoga App.
 
 
-## Configuration du back
+## Backend configuration
 
     - name: back
     - port: 8080
 
-## Pré-requis pour le bon fonctionnement du back :
+## Prerequisites
 
     -> JDK 21
     -> Docker
     -> Docker Compose
-    -> Maven 3.9.3 (https://archive.apache.org/dist/maven/maven-3/3.9.3/binaries/) ou plus
+    -> Maven 3.9.3 (https://archive.apache.org/dist/maven/maven-3/3.9.3/binaries/) or higher
 
-## Démarrage du back
-Pour démarrer le back, il :
-- démarrer Docker-Desktop sur votre poste de travail local.
-- lancer une console, se placer à la racine du projet et exécuter la commande Maven :
+## Environment configuration
+
+Configuration is provided through the `back/.env` file, already checked in with working
+default values for local development:
+
+```
+DB_USER=user_test
+DB_PASSWORD=test_password
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=test
+TOKEN_SECRET=<base64-encoded secret used to sign JWTs>
+```
+
+These variables are consumed in two places:
+- `back/compose.yaml` uses `DB_NAME`, `DB_USER` and `DB_PASSWORD` to initialize the MySQL
+  container started by Docker Compose.
+- `back/src/main/resources/application.yml` uses `DB_USER`, `DB_PASSWORD`, `DB_HOST`,
+  `DB_PORT` and `DB_NAME` to build the JDBC connection URL, and `TOKEN_SECRET`
+  (`oc.app.jwtSecret`) to sign JWT tokens.
+
+No manual setup is required to run the project locally: just leave the provided values as
+they are, or override them with your own if needed.
+
+## Starting the backend
+To start the backend:
+- start Docker Desktop on your local machine.
+- open a terminal, go to the project root, and run the Maven command:
 ```
 mvn spring-boot:run
 ```
-Cette commande va :
-- initialiser le container Docker qui contient la base de données
-- lancer l'application back et le connecter à la base de données précédemment créée
+This command will:
+- initialize the Docker container that holds the database
+- start the backend application and connect it to the database created above
 
-Les traces logs devraient ressemblées à ceci :
+The logs should look like this:
 ```
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -76,60 +100,78 @@ Les traces logs devraient ressemblées à ceci :
 [back] [           main] c.o.s.SpringBootSecurityJwtApplication   : Started SpringBootSecurityJwtApplication in 10.354 seconds (process running for 11.197)
 ```
 
-Sur Docker-Desktop, vous devriez voir apparaître un container MySQL qui correspond au projet.
+In Docker Desktop, you should see a MySQL container matching the project appear.
 
 ![1-docker-desktop](pictures/1-docker-desktop.png)
 
-Vous pouvez vous connecter à la base de données et vérifier que la table ```USERS``` a été créée.
-Pour cela, cliquez sur le lien `back_mysql` ce qui vous amènera sur la vue complète de la base de données.
-Dans l'onglet ```Exec```, il faut :
+You can connect to the database and check that the ```USERS``` table has been created.
+To do so, click on the `back_mysql` link, which will take you to the full database view.
+In the ```Exec``` tab:
 
-1. se connecter à la base de données. Tapez la commande ci-dessous
+1. Connect to the database. Type the command below:
 
     ```
     mysql -u user_test -p
     ```
-   L'invite de commande demandera le mot de passe. Il est : ```test_password```.
+   The prompt will ask for the password. It is: ```test_password```.
 
 
-2. Se connecter au schéma de base de données `test`. Dans l'invite de commande, tapez la commande ci-dessous :
+2. Connect to the `test` database schema. In the prompt, type the command below:
 
     ```
     use test;
     ```
 
-3. Copier le contenu du fichier `ressources/sql/insert_user.sql` et l'exécuter dans l'invite de commande :
+3. Copy the content of the `ressources/sql/insert_user.sql` file and run it in the prompt:
 
     ```
     INSERT INTO users(first_name, last_name, admin, email, password) VALUES ('Admin', 'Admin', true, 'yoga@studio.com', '$2a$10$.Hsa/ZjUVaHqi0tp9xieMeewrnZxrZ5pQRzddUXE/WjDu2ZThe6Iq');
     ```
-   
-3. Vérifier le contenu de la table `users`.
+
+3. Check the content of the `users` table.
 
     ```
     select * from users;
     ```
-   Le résultat devrait afficher les données de l'utilisateur inséré précédemment.
-   
-   Ce script crée l'utilisateur admin par défaut :
+   The result should display the data of the user inserted above.
+
+   This script creates the default admin user:
 
    - login: yoga@studio.com
    - password: test!1234
 
-La capture d'écran ci-dessous résume les étapes précédentes :
+The screenshot below summarizes the previous steps:
 
 ![2-docker-desktop-bdd](pictures/2-docker-desktop-bdd.png)
 
 
-## Ressources
+## Tests
+
+### Run unit and integration tests
+
+    mvn test
+
+### Generate the coverage report and check the minimum threshold
+
+    mvn verify
+
+This command runs the 96 tests (unit + integration), generates the Jacoco coverage report, then automatically checks that coverage meets the minimum threshold configured in the `pom.xml`.
+
+The HTML report is available here:
+
+    back/target/site/jacoco/index.html
+
+The `dto` package (plain data transfer objects, no business logic) is intentionally excluded from coverage, along with the JPA models, configuration and repositories.
+
+## Resources
 
 
-### Collection Postman
+### Postman collection
 
-Importez la collection Postman
+Import the Postman collection
 
 > postman/yoga.postman_collection.json
 
-La documentation de Postman se trouve ici :
+Postman's documentation is available here:
 
 https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman
