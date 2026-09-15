@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { expect } from '@jest/globals';
 
 import { AppComponent } from './app.component';
-import { AuthService } from './core/service/auth.service';
 import { SessionService } from './core/service/session.service';
 
 describe('AppComponent', () => {
@@ -19,7 +18,6 @@ describe('AppComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
       providers: [
-        { provide: AuthService, useValue: {} },
         { provide: SessionService, useValue: sessionService },
         { provide: Router, useValue: router }
       ]
