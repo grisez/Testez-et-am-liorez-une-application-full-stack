@@ -95,4 +95,22 @@ describe('DetailComponent', () => {
     expect(matSnackBar.open).toHaveBeenCalled();
     expect(router.navigate).toHaveBeenCalledWith(['sessions']);
   });
+
+  it('should call the API to join the session and refresh it', () => {
+    createComponent(false, { id: 1, name: 'Yoga du matin', description: 'Une session', date: new Date('2026-09-20'), teacher_id: 1, users: [] });
+
+    component.participate();
+
+    expect(sessionApiService.participate).toHaveBeenCalledWith('1', '2');
+    expect(sessionApiService.detail).toHaveBeenCalledTimes(2);
+  });
+
+  it('should call the API to leave the session and refresh it', () => {
+    createComponent(false, { id: 1, name: 'Yoga du matin', description: 'Une session', date: new Date('2026-09-20'), teacher_id: 1, users: [2] });
+
+    component.unParticipate();
+
+    expect(sessionApiService.unParticipate).toHaveBeenCalledWith('1', '2');
+    expect(sessionApiService.detail).toHaveBeenCalledTimes(2);
+  });
 });
