@@ -1,6 +1,6 @@
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { switchMap, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Teacher } from '../../../../core/models/teacher.interface';
@@ -59,15 +59,15 @@ export class DetailComponent implements OnInit {
   }
 
   public participate(): void {
-    this.sessionApiService
-      .participate(this.sessionId, this.userId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.fetchSession());
+    this.refreshAfter(this.sessionApiService.participate(this.sessionId, this.userId));
   }
 
   public unParticipate(): void {
-    this.sessionApiService
-      .unParticipate(this.sessionId, this.userId)
+    this.refreshAfter(this.sessionApiService.unParticipate(this.sessionId, this.userId));
+  }
+
+  private refreshAfter(action$: Observable<void>): void {
+    action$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.fetchSession());
   }
