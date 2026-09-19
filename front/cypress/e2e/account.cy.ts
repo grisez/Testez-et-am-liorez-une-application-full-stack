@@ -31,4 +31,20 @@ describe('Account spec', () => {
 
     cy.contains('Login').should('be.visible');
   });
+
+  it('should delete the account and redirect to the login/register screen', () => {
+    cy.intercept('GET', '/api/session', []).as('sessions');
+    cy.login(false);
+    cy.wait('@sessions');
+
+    cy.intercept('GET', '/api/user/1', user).as('user');
+    cy.contains('Account').click();
+    cy.wait('@user');
+
+    cy.intercept('DELETE', '/api/user/1', {}).as('deleteUser');
+    cy.get('button[color="warn"]').click();
+    cy.wait('@deleteUser');
+
+    cy.contains('Login').should('be.visible');
+  });
 });
